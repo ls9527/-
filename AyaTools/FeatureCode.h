@@ -5,7 +5,7 @@ public:
 	FeatureCode(void);
 	~FeatureCode(void);
 	BOOL convertAsciiToCharPoint(const char* szAscii,const int &szAsciiLen,char* charPoint,int &charPointLen);
-	BOOL GetDataAndBaseAddr(HANDLE hProcess,char* featureCode,DWORD feaLen,int addrOffset,DWORD addrLen,TCHAR * readDataBuff,DWORD& baseAddr);
+	DWORD GetDataAndBaseAddr(HANDLE hProcess,char* featureCode,DWORD feaLen,int addrOffset,DWORD addrLen,TCHAR * readDataBuff,DWORD& baseAddr);
 private:
 	BYTE charToAsciiCode(char a);
 	

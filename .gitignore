@@ -2,5 +2,4 @@ Debug
 Release
 *.log
 *.bak
-*.log
-AyaTools/Release/AyaTools.log
+AyaTools/Release

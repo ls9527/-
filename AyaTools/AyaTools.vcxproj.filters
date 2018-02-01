@@ -36,6 +36,12 @@
     <ClInclude Include="FeatureCode.h">
       <Filter>头文件</Filter>
     </ClInclude>
+    <ClInclude Include="MainDlg.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="SelectHwndStatic.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="AyaTools.cpp">
@@ -48,6 +54,12 @@
       <Filter>源文件</Filter>
     </ClCompile>
     <ClCompile Include="FeatureCode.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="MainDlg.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="SelectHwndStatic.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
   </ItemGroup>

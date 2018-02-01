@@ -1,0 +1,9 @@
+{
+	 "version":1.0,
+	 "name":"计算器特征码查询工具",	
+	 "description":"codeSize:读取的字节大小，distance:距离特征码的差异值，负数就加负号. type:BYTE,WORD,DWORD,BASEADDR,读取的是字节还是基址. key:生成的节区名字",
+	 "feaArray":[
+	 	{"feaCode":"8B 45 14 66 3D 93 01","distance":"26","name":"numberdown","key":"number","type":"BASEADDR","description":"按下数字的call"},
+	 	{"feaCode":"8B 45 14 66 3D 93 01","distance":"26","name":"numberA","key":"number","type":"DWORD","description":"加号call"}
+	 	]
+}	

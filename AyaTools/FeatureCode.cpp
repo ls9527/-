@@ -45,12 +45,19 @@ DWORD FeatureCode::GetFeaturePoint(HANDLE hProcess, char* featureCode,int featur
 	int tzmLen = featureLen;
 	int searhBufLen = 4096;
 	//DWORD startSearch = 0x7FFFFFFF;
-	DWORD startSearch = 0x0000000;
+	DWORD startSearch = 0x0;
 	char* searchBuff = new char[searhBufLen];
 	DWORD searchRealLen = 0;
 
 	DWORD baseAddr = 0;
 	BOOL findBaseAddr = FALSE;
+	/*
+	BOOL bRetRead = ::ReadProcessMemory(hProcess,(LPVOID)startSearch,searchBuff,searhBufLen,&searchRealLen);
+	if(!bRetRead){
+		int lastError = GetLastError();
+		throw "读取数据失败";
+	}
+	*/
 	while(true){
 		ReadProcessMemory(hProcess,(LPVOID)startSearch,searchBuff,searhBufLen,&searchRealLen);
 		for(int i = 0;i<searhBufLen - tzmLen;i++){
@@ -68,7 +75,7 @@ DWORD FeatureCode::GetFeaturePoint(HANDLE hProcess, char* featureCode,int featur
 		}
 		//startSearch+= (searhBufLen - tzmLen);
 		startSearch+= searhBufLen-tzmLen;
-		if(startSearch>=0xFFFFFFFF){
+		if(startSearch>=0x7FFFFFFF){
 			break;
 		}
 	}
@@ -129,7 +136,7 @@ BOOL FeatureCode::GetFmtBuff(char* buff,int readLen,__out TCHAR * text){
 	return TRUE;
 }
 
-BOOL FeatureCode::GetDataAndBaseAddr(HANDLE hProcess,char* featureCode,DWORD feaLen,int addrOffset,DWORD addrLen,TCHAR* readDataBuff,DWORD& callAddr)
+DWORD FeatureCode::GetDataAndBaseAddr(HANDLE hProcess,char* featureCode,DWORD feaLen,int addrOffset,DWORD addrLen,TCHAR * readDataBuff,DWORD& callAddr)
 {
 	//int nFeatureCode = m_szFeatureCode.GetLength();
 	//TCHAR * featureCode = m_szFeatureCode .GetBuffer(nFeatureCode);
@@ -146,8 +153,9 @@ BOOL FeatureCode::GetDataAndBaseAddr(HANDLE hProcess,char* featureCode,DWORD fea
 
 
 	
-
-	GetFmtBuff(readData,addrLen,readDataBuff);
+	int* result = (int*)readData;
+	if(readDataBuff!=NULL)
+		GetFmtBuff(readData,addrLen,readDataBuff);
 
 	//载入cpu的下一个指令
 	DWORD nextPoint = baseAddr+addrOffset+ 4 ;
@@ -158,7 +166,7 @@ BOOL FeatureCode::GetDataAndBaseAddr(HANDLE hProcess,char* featureCode,DWORD fea
 		callAddr = nextPoint - pAddr;
 	}
 
-	return TRUE;
+	return *result;
 }
 
 
