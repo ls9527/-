@@ -135,8 +135,22 @@ BOOL CMainDlg::OnInitDialog()
 
 void CMainDlg::InitialConfigData()
 {
-	
-	CFile file(_T("D:/github_work/-/AyaTools/config.json"),CFile::modeRead);
+	CString configPath;
+	GetModuleFileName(NULL,configPath.GetBuffer(MAX_PATH),MAX_PATH);
+	configPath.ReleaseBuffer();
+	configPath = configPath.Left(configPath.ReverseFind('\\')+1);
+	configPath+="config.json";
+	CFile file;
+	CFileException exc;
+	if(file.Open(configPath, CFile::modeRead | CFile::shareDenyWrite | CFile::typeBinary,&exc) == 0)  {
+		if(exc.m_cause){
+			MessageBox(_T("配置文件不存在，请设置config.json在exe当前目录。"));
+			PostQuitMessage(0);
+			return;
+		}
+		
+	}
+	//(configPath,CFile::modeRead|CFile::modeNoInherit   );
 
 	char *buff = new char[CACHE_SIZE];//最大512KB配置文件
 	memset(buff,0,CACHE_SIZE);
@@ -167,9 +181,9 @@ void CMainDlg::OnBnClickedButtonReadConfig()
 	
 	DWORD processId;
 	::GetWindowThreadProcessId(m_dragToProgress.m_SelectHwnd,&processId);
-	HANDLE hProcess = ::OpenProcess(PROCESS_ALL_ACCESS,NULL,processId)	;
+	HANDLE hProcess = ::OpenProcess(PROCESS_VM_READ|PROCESS_QUERY_INFORMATION,NULL,processId)	;
 	ASSERT(hProcess);
-
+	
 
 	
 	// TODO: 在此添加控件通知处理程序代码
@@ -205,6 +219,7 @@ void CMainDlg::OnBnClickedButtonReadConfig()
 		CString strFeatureCode(feaCodeStr);
 		int nFeatureCode = strFeatureCode.GetLength();
 		TCHAR * featureCode = strFeatureCode .GetBuffer(nFeatureCode);
+		
 		CW2A fCodeAscii(featureCode);
 		int feaLen = nFeatureCode/3 +(nFeatureCode%3!=0);
 		char * feaCode = new char[feaLen];
@@ -218,25 +233,22 @@ void CMainDlg::OnBnClickedButtonReadConfig()
 		CString strValue;
 		if(strcmp(type,"BASEADDR")==0){
 			CString strAddr;
-			strAddr.Format(_T("%x"),callAddr);
+			strAddr.Format(_T("%08x"),callAddr);
 			m_listData.SetItemText(index,3,strAddr);
 		}else{
 			CString strReadNumber;
 			if(codeSize==4){
-				strReadNumber.Format(_T("%x"),readDWORD);
+				strReadNumber.Format(_T("%08x"),readDWORD);
 			}else if(codeSize==2){
-				strReadNumber.Format(_T("%x"),readDWORD&0xFFFF);
+				strReadNumber.Format(_T("%04x"),readDWORD&0xFFFF);
 			}else if(codeSize==1){
-				strReadNumber.Format(_T("%x"),readDWORD&0xFF);
+				strReadNumber.Format(_T("%02x"),readDWORD&0xFF);
 			}
 			m_listData.SetItemText(index,3,strReadNumber);
 		}
 		
 		index++;
 	}
-
-
-	
 	
 
 	CloseHandle(hProcess);
@@ -245,6 +257,23 @@ void CMainDlg::OnBnClickedButtonReadConfig()
 
 void CMainDlg::OnBnClickedButtonExportIni()
 {
-	// TODO: 在此添加控件通知处理程序代码
 
+	CString configPath;
+	GetModuleFileName(NULL,configPath.GetBuffer(MAX_PATH),MAX_PATH);
+	configPath.ReleaseBuffer();
+	configPath = configPath.Left(configPath.ReverseFind('\\')+1);
+	configPath+="config.ini";
+
+	// TODO: 在此添加控件通知处理程序代码
+	int index = 0;
+	Json::Value feaArray = m_jsonRoot["feaArray"];
+	
+	for(auto iter = feaArray.begin();iter!=feaArray.end();iter++){
+		Json::Value iterValue = (*iter);
+		CString text;
+		m_listData.GetItemText(index,3,text.GetBuffer(10),10);
+		text.ReleaseBuffer();
+		WritePrivateProfileString(CA2W(iterValue["key"].asCString()),CA2W(iterValue["name"].asCString()),text,configPath);
+		index++;
+	}
 }

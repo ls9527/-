@@ -174,7 +174,7 @@ void CAyaToolsDlg::OnBnClickedButtonCall()
 	HWND hwnd =::FindWindow(NULL,_T("¼ÆËãÆ÷"));
 	DWORD processId;
 	::GetWindowThreadProcessId(hwnd,&processId);
-	HANDLE hProcess = ::OpenProcess(PROCESS_ALL_ACCESS,NULL,processId)	;
+	HANDLE hProcess = ::OpenProcess(PROCESS_VM_READ|PROCESS_QUERY_INFORMATION,NULL,processId);
 	ASSERT(hProcess);
 
 	FeatureCode fc;

@@ -39,34 +39,29 @@ BOOL FeatureCode::convertAsciiToCharPoint(const char* szAscii,const int &szAscii
 
 DWORD FeatureCode::GetFeaturePoint(HANDLE hProcess, char* featureCode,int featureLen)
 {
-	
+	ASSERT(hProcess|"hProcess must not be null");
 	//特征码8B 45 14 66 3D 93 01
 	char *tzm =  featureCode;//{0x8B,0x45,0x14,0x66,0x3d,0x93,0x01};//"8b4514663d9301\0";
 	int tzmLen = featureLen;
 	int searhBufLen = 4096;
 	//DWORD startSearch = 0x7FFFFFFF;
-	DWORD startSearch = 0x0;
+	DWORD startSearch = 0x400000;//默认的应用程序pe文件首地址
+	
 	char* searchBuff = new char[searhBufLen];
 	DWORD searchRealLen = 0;
-
 	DWORD baseAddr = 0;
 	BOOL findBaseAddr = FALSE;
-	/*
-	BOOL bRetRead = ::ReadProcessMemory(hProcess,(LPVOID)startSearch,searchBuff,searhBufLen,&searchRealLen);
-	if(!bRetRead){
-		int lastError = GetLastError();
-		throw "读取数据失败";
-	}
-	*/
+	
+	
 	while(true){
+		memset(searchBuff,0,searhBufLen);
 		ReadProcessMemory(hProcess,(LPVOID)startSearch,searchBuff,searhBufLen,&searchRealLen);
-		for(int i = 0;i<searhBufLen - tzmLen;i++){
-			int cmpRes = memcmp(searchBuff+i,tzm,tzmLen);
-			if(!cmpRes){//相等
+		for(int i = 0;i<searchRealLen;i++){
+			if(memcmp(searchBuff+i,tzm,tzmLen)==0){//相等
 				baseAddr =  (int)(startSearch+i);
 				findBaseAddr =  TRUE;
 				break;
-
+				
 				//continue;
 			}
 		}
@@ -74,12 +69,14 @@ DWORD FeatureCode::GetFeaturePoint(HANDLE hProcess, char* featureCode,int featur
 			break;
 		}
 		//startSearch+= (searhBufLen - tzmLen);
-		startSearch+= searhBufLen-tzmLen;
+		startSearch+= searhBufLen ;
 		if(startSearch>=0x7FFFFFFF){
+			//AfxMessageBox(_T("not found baseAddr"));
 			break;
 		}
 	}
 
+	delete [] searchBuff;
 	return baseAddr;
 }
 const char book []= {'0','1','2','3','4','5','6','7','8','9','A','B','C','D','E','F'};
