@@ -67,7 +67,7 @@ DWORD FeatureCode::GetFeaturePoint(HANDLE hProcess, char* featureCode,int featur
 			break;
 		}
 		//startSearch+= (searhBufLen - tzmLen);
-		startSearch+= searhBufLen;
+		startSearch+= searhBufLen-tzmLen;
 		if(startSearch>=0xFFFFFFFF){
 			break;
 		}

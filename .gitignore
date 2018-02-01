@@ -1,2 +1,6 @@
-./Debug
-./Release
+Debug
+Release
+*.log
+*.bak
+*.log
+AyaTools/Release/AyaTools.log
